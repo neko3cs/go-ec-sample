@@ -2,12 +2,14 @@ package main
 
 import (
 	"go-ec-sample/controller"
+	"go-ec-sample/db"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	db.Init()
 	r := gin.Default()
 
 	r.SetFuncMap(template.FuncMap{})
