@@ -112,3 +112,19 @@ func (c *ProductController) Update(ctx *gin.Context) {
 
 	ctx.Redirect(302, "/products/"+idStr)
 }
+
+func (c *ProductController) Delete(ctx *gin.Context) {
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		ctx.String(400, "Invalid ID")
+		return
+	}
+
+	err = c.service.DeleteProduct(uint(id))
+	if err != nil {
+		ctx.String(500, "Failed to delete product")
+		return
+	}
+
+	ctx.Redirect(302, "/products")
+}
