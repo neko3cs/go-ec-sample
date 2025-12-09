@@ -1,17 +1,20 @@
 package service
 
 import (
+	"go-ec-sample/command"
 	"go-ec-sample/domain"
 	"go-ec-sample/query"
 )
 
 type ProductService struct {
-	query *query.ProductQuery
+	query   *query.ProductQuery
+	command *command.ProductCommand
 }
 
-func NewProductService() *ProductService {
+func NewProductService(q *query.ProductQuery, c *command.ProductCommand) *ProductService {
 	return &ProductService{
-		query: query.NewProductQuery(),
+		query:   q,
+		command: c,
 	}
 }
 
@@ -21,4 +24,12 @@ func (s *ProductService) GetAllProducts() ([]domain.Product, error) {
 
 func (s *ProductService) GetProduct(id uint) (*domain.Product, error) {
 	return s.query.FindByID(id)
+}
+
+func (s *ProductService) CreateProduct(name string, price int) error {
+	p := &domain.Product{
+		Name:  name,
+		Price: price,
+	}
+	return s.command.InsertProduct(p)
 }
