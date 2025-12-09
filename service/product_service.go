@@ -18,3 +18,7 @@ func NewProductService() *ProductService {
 func (s *ProductService) GetAllProducts() ([]domain.Product, error) {
 	return s.query.FindAll()
 }
+
+func (s *ProductService) GetProduct(id uint) (*domain.Product, error) {
+	return s.query.FindByID(id)
+}

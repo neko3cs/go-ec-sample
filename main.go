@@ -17,6 +17,7 @@ func main() {
 
 	productController := controller.NewProductController()
 	r.GET("/products", productController.Index)
+	r.GET("/products/:id", productController.Show)
 
 	r.Run(":8080") // http://localhost:8080
 }

@@ -12,7 +12,7 @@
 
   <ul>
     {{range .Products}}
-    <li>{{.Name}} - {{.Price}}円</li>
+    <li><a href="/products/{{ .ID }}">{{ .Name }}</a> - {{.Price}}円</li>
     {{end}}
   </ul>
 

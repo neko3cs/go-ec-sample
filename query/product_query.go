@@ -16,3 +16,12 @@ func (q *ProductQuery) FindAll() ([]domain.Product, error) {
 	err := db.GetDB().Find(&products).Error
 	return products, err
 }
+
+func (q *ProductQuery) FindByID(id uint) (*domain.Product, error) {
+	var product domain.Product
+	err := db.GetDB().First(&product, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &product, nil
+}
