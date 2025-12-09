@@ -6,46 +6,38 @@ import (
 	"go-ec-sample/query"
 )
 
-type ProductService struct {
-	query   *query.ProductQuery
-	command *command.ProductCommand
-}
+type ProductService struct{}
 
-func NewProductService(q *query.ProductQuery, c *command.ProductCommand) *ProductService {
-	return &ProductService{
-		query:   q,
-		command: c,
-	}
+func NewProductService() *ProductService {
+	return &ProductService{}
 }
 
 func (s *ProductService) GetAllProducts() ([]domain.Product, error) {
-	return s.query.FindAll()
+	q := query.NewGetAllProductsQuery()
+	h := query.NewGetAllProductsQueryHandler()
+	return h.Handle(q)
 }
 
 func (s *ProductService) GetProduct(id uint) (*domain.Product, error) {
-	return s.query.FindByID(id)
+	q := query.NewGetProductQuery(id)
+	h := query.NewGetProductQueryHandler()
+	return h.Handle(q)
 }
 
 func (s *ProductService) CreateProduct(name string, price int) error {
-	p := &domain.Product{
-		Name:  name,
-		Price: price,
-	}
-	return s.command.InsertProduct(p)
+	c := command.NewCreateProductCommand(name, price)
+	h := command.NewCreateProductCommandHandler()
+	return h.Handle(c)
 }
 
 func (s *ProductService) UpdateProduct(id uint, name string, price int) error {
-	p, err := s.query.FindByID(id)
-	if err != nil {
-		return err
-	}
-
-	p.Name = name
-	p.Price = price
-
-	return s.command.UpdateProduct(p)
+	c := command.NewUpdateProductCommand(id, name, price)
+	h := command.NewUpdateProductCommandHandler()
+	return h.Handle(c)
 }
 
 func (s *ProductService) DeleteProduct(id uint) error {
-	return s.command.DeleteProduct(id)
+	c := command.NewDeleteProductCommand(id)
+	h := command.NewDeleteProductCommandHandler()
+	return h.Handle(c)
 }
