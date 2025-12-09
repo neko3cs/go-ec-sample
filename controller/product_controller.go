@@ -13,10 +13,8 @@ type ProductController struct {
 	service *service.ProductService
 }
 
-func NewProductController() *ProductController {
-	return &ProductController{
-		service: service.NewProductService(),
-	}
+func NewProductController(s *service.ProductService) *ProductController {
+	return &ProductController{service: s}
 }
 
 func (c *ProductController) Index(ctx *gin.Context) {
@@ -47,4 +45,27 @@ func (c *ProductController) Show(ctx *gin.Context) {
 	ctx.HTML(200, "product_detail.html", gin.H{
 		"Product": product,
 	})
+}
+
+func (c *ProductController) New(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "product_new.html", gin.H{})
+}
+
+func (c *ProductController) Create(ctx *gin.Context) {
+	name := ctx.PostForm("name")
+	priceStr := ctx.PostForm("price")
+
+	price, err := strconv.Atoi(priceStr)
+	if err != nil {
+		ctx.String(400, "Invalid price")
+		return
+	}
+
+	err = c.service.CreateProduct(name, price)
+	if err != nil {
+		ctx.String(500, "Failed to create product")
+		return
+	}
+
+	ctx.Redirect(302, "/products")
 }
