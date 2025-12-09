@@ -28,6 +28,8 @@ func main() {
 	r.GET("/products/:id", productController.Show)
 	r.GET("/products/new", productController.New)
 	r.POST("/products", productController.Create)
+	r.GET("/products/:id/edit", productController.Edit)
+	r.POST("/products/:id", productController.Update)
 
 	r.Run(":8080") // http://localhost:8080
 }
