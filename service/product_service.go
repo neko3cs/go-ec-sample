@@ -33,3 +33,15 @@ func (s *ProductService) CreateProduct(name string, price int) error {
 	}
 	return s.command.InsertProduct(p)
 }
+
+func (s *ProductService) UpdateProduct(id uint, name string, price int) error {
+	p, err := s.query.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	p.Name = name
+	p.Price = price
+
+	return s.command.UpdateProduct(p)
+}

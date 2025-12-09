@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Product</title>
+</head>
+
+<body>
+
+  <h1>Edit Product</h1>
+
+  <form action="/products/{{ .Product.ID }}" method="post">
+    <div>
+      <label>Name:</label>
+      <input type="text" name="name" value="{{ .Product.Name }}" required>
+    </div>
+
+    <div>
+      <label>Price:</label>
+      <input type="number" name="price" value="{{ .Product.Price }}" required>
+    </div>
+
+    <button type="submit">Update</button>
+  </form>
+
+  <a href="/products/{{ .Product.ID }}">Back to details</a>
+
+</body>
+
+</html>

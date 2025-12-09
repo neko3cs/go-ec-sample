@@ -14,3 +14,7 @@ func NewProductCommand() *ProductCommand {
 func (c *ProductCommand) InsertProduct(p *domain.Product) error {
 	return db.GetDB().Create(p).Error
 }
+
+func (c *ProductCommand) UpdateProduct(p *domain.Product) error {
+	return db.GetDB().Save(p).Error
+}

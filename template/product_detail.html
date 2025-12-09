@@ -10,7 +10,14 @@
   <h1>{{ .Product.Name }}</h1>
   <p>Price: ¥{{ .Product.Price }}</p>
 
-  <a href="/products">← Back to list</a>
+  <ul style="list-style: none; padding: 0;">
+    <li>
+      <a href="/products/{{ .Product.ID }}/edit">edit</a>
+    </li>
+    <li>
+      <a href="/products">Back to list</a>
+    </li>
+  </ul>
 </body>
 
 </html>
