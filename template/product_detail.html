@@ -10,6 +10,10 @@
   <h1>{{ .Product.Name }}</h1>
   <p>Price: ¥{{ .Product.Price }}</p>
 
+  <form action="/products/{{ .Product.ID }}/delete" method="post" style="margin-top:20px;">
+    <button type="submit" onclick="return confirm('本当に削除しますか？');">Delete</button>
+  </form>
+
   <ul style="list-style: none; padding: 0;">
     <li>
       <a href="/products/{{ .Product.ID }}/edit">edit</a>

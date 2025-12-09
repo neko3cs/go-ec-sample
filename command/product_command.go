@@ -18,3 +18,7 @@ func (c *ProductCommand) InsertProduct(p *domain.Product) error {
 func (c *ProductCommand) UpdateProduct(p *domain.Product) error {
 	return db.GetDB().Save(p).Error
 }
+
+func (c *ProductCommand) DeleteProduct(id uint) error {
+	return db.GetDB().Delete(&domain.Product{}, id).Error
+}

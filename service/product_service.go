@@ -45,3 +45,7 @@ func (s *ProductService) UpdateProduct(id uint, name string, price int) error {
 
 	return s.command.UpdateProduct(p)
 }
+
+func (s *ProductService) DeleteProduct(id uint) error {
+	return s.command.DeleteProduct(id)
+}
