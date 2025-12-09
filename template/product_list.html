@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>商品一覧</title>
+</head>
+
+<body>
+
+  <h1>商品一覧</h1>
+
+  <ul>
+    {{range .Products}}
+    <li>{{.Name}} - {{.Price}}円</li>
+    {{end}}
+  </ul>
+
+</body>
+
+</html>
