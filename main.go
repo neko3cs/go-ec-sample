@@ -1,7 +1,8 @@
 package main
 
 import (
-	"net/http"
+	"go-ec-sample/controller"
+	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,9 +10,11 @@ import (
 func main() {
 	r := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, EC Sample!")
-	})
+	r.SetFuncMap(template.FuncMap{})
+	r.LoadHTMLGlob("template/*.html")
+
+	productController := controller.NewProductController()
+	r.GET("/products", productController.Index)
 
 	r.Run(":8080") // http://localhost:8080
 }
