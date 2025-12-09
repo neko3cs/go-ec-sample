@@ -1,10 +1,8 @@
 package main
 
 import (
-	"go-ec-sample/command"
 	"go-ec-sample/controller"
 	"go-ec-sample/db"
-	"go-ec-sample/query"
 	"go-ec-sample/service"
 	"text/template"
 
@@ -19,10 +17,7 @@ func main() {
 	r.LoadHTMLGlob("template/*.html")
 
 	productController := controller.NewProductController(
-		service.NewProductService(
-			query.NewProductQuery(),
-			command.NewProductCommand(),
-		),
+		service.NewProductService(),
 	)
 	r.GET("/products", productController.Index)
 	r.GET("/products/:id", productController.Show)
