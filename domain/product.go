@@ -1,7 +1,7 @@
 package domain
 
 type Product struct {
-	ID    int
+	ID    uint `gorm:"primarykey"`
 	Name  string
 	Price int
 }
