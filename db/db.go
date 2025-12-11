@@ -3,8 +3,6 @@ package db
 import (
 	"log"
 
-	"go-ec-sample/domain"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -19,11 +17,11 @@ func Init() {
 		log.Fatal("failed to connect SQLite:", err)
 	}
 
-	db.AutoMigrate(&domain.Product{})
+	db.AutoMigrate(&Product{})
 
-	db.Create(&domain.Product{Name: "Apple", Price: 120})
-	db.Create(&domain.Product{Name: "Banana", Price: 80})
-	db.Create(&domain.Product{Name: "Strawberry", Price: 300})
+	db.Create(&Product{Name: "Apple", Price: 120})
+	db.Create(&Product{Name: "Banana", Price: 80})
+	db.Create(&Product{Name: "Strawberry", Price: 300})
 
 	database = db
 }
