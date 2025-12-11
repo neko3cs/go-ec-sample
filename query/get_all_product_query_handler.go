@@ -12,7 +12,15 @@ func NewGetAllProductsQueryHandler() *GetAllProductsQueryHandler {
 }
 
 func (h *GetAllProductsQueryHandler) Handle(query *GetAllProductsQuery) ([]domain.Product, error) {
+	var dbProducts []db.Product
+	err := db.GetDB().Find(&dbProducts).Error
+	if err != nil {
+		return nil, err
+	}
+
 	var products []domain.Product
-	err := db.GetDB().Find(&products).Error
+	for _, p := range dbProducts {
+		products = append(products, *domain.NewProduct(p.Id, p.Name, p.Price))
+	}
 	return products, err
 }
