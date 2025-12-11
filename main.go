@@ -27,5 +27,5 @@ func main() {
 	r.POST("/products/:id", productController.Update)
 	r.POST("/products/:id/delete", productController.Delete)
 
-	r.Run(":8080") // http://localhost:8080
+	r.Run(":8080") // http://localhost:8080/products
 }
