@@ -10,7 +10,7 @@
 
   <h1>Edit Product</h1>
 
-  <form action="/products/{{ .Product.ID }}" method="post">
+  <form action="/products/{{ .Product.Id }}" method="post">
     <div>
       <label>Name:</label>
       <input type="text" name="name" value="{{ .Product.Name }}" required>
@@ -24,7 +24,7 @@
     <button type="submit">Update</button>
   </form>
 
-  <a href="/products/{{ .Product.ID }}">Back to details</a>
+  <a href="/products/{{ .Product.Id }}">Back to details</a>
 
 </body>
 
