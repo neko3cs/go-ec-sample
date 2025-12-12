@@ -39,3 +39,11 @@ func (c *LoginController) Login(ctx *gin.Context) {
 
 	ctx.Redirect(http.StatusFound, "/products")
 }
+
+func (lc *LoginController) Logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+
+	c.Redirect(http.StatusFound, "/login")
+}
