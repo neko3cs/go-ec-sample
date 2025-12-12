@@ -31,6 +31,7 @@ func main() {
 
 	r.GET("/login", loginController.ShowLogin)
 	r.POST("/login", loginController.Login)
+	r.GET("/logout", loginController.Logout)
 	authed := r.Group("/products")
 	authed.Use(middleware.AuthRequired())
 	{
