@@ -28,6 +28,9 @@ func main() {
 	productController := controller.NewProductController(
 		service.NewProductService(),
 	)
+	cartController := controller.NewCartController(
+		service.NewCartService(),
+	)
 
 	r.GET("/login", loginController.ShowLogin)
 	r.POST("/login", loginController.Login)
@@ -37,6 +40,14 @@ func main() {
 	{
 		authed.GET("/", productController.Index)
 		authed.GET("/:id", productController.Show)
+	}
+	cart := r.Group("/cart")
+	cart.Use(middleware.AuthRequired())
+	{
+		cart.GET("", cartController.Index)
+		cart.POST("/add", cartController.Add)
+		cart.POST("/remove", cartController.Remove)
+		cart.POST("/checkout", cartController.Checkout)
 	}
 	admin := r.Group("/admin")
 	admin.Use(middleware.AuthRequired(), middleware.AdminRequired())

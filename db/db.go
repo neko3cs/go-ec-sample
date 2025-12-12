@@ -21,9 +21,9 @@ func Init() {
 		&Product{},
 		&User{})
 
-	db.Create(&Product{Name: "Apple", Price: 120})
-	db.Create(&Product{Name: "Banana", Price: 80})
-	db.Create(&Product{Name: "Strawberry", Price: 300})
+	db.Create(&Product{Name: "Apple", Price: 120, Stock: 50})
+	db.Create(&Product{Name: "Banana", Price: 80, Stock: 100})
+	db.Create(&Product{Name: "Strawberry", Price: 300, Stock: 30})
 	db.Create(&User{Name: "Admin", Email: "admin@example.com", Password: "password", IsAdmin: true})
 	db.Create(&User{Name: "User", Email: "user@example.com", Password: "password", IsAdmin: false})
 

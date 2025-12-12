@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cart</title>
+</head>
+
+<body>
+
+  <h1>Cart</h1>
+
+  <table>
+    <tr>
+      <th>商品名</th>
+      <th>価格</th>
+      <th>数量</th>
+      <th>操作</th>
+    </tr>
+    {{range .Cart.Items}}
+    <tr>
+      <td>{{.Name}}</td>
+      <td>{{.Price}}</td>
+      <td>{{.Quantity}}</td>
+      <td>
+        <form action="/cart/remove" method="POST">
+          <input type="hidden" name="product_id" value="{{.ProductId}}">
+          <button type="submit">削除</button>
+        </form>
+      </td>
+    </tr>
+    {{end}}
+  </table>
+
+  <p>合計: {{.Cart.TotalCost}}</p>
+  <form action="/cart/checkout" method="POST">
+    <button type="submit">購入</button>
+  </form>
+  <a href="/products">Back to list</a>
+
+</body>
+
+</html>

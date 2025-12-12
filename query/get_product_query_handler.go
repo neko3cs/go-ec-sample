@@ -18,6 +18,6 @@ func (h *GetProductQueryHandler) Handle(q *GetProductQuery) (*domain.Product, er
 		return nil, err
 	}
 
-	product := domain.NewProduct(dbProduct.Id, dbProduct.Name, dbProduct.Price)
+	product := domain.NewProduct(dbProduct.Id, dbProduct.Name, dbProduct.Price, dbProduct.Stock)
 	return product, nil
 }

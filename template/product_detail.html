@@ -9,6 +9,14 @@
 <body>
   <h1>{{ .Product.Name }}</h1>
   <p>Price: ¥{{ .Product.Price }}</p>
+  <p>Stock: {{ .Product.Stock }}個</p>
+
+  <form action="/cart/add" method="POST">
+    <input type="hidden" name="product_id" value="{{.Product.Id}}">
+    <label>購入個数</label>
+    <input type="number" name="quantity" min="1" max="{{.Product.Stock}}" required>
+    <button type="submit">カートに追加</button>
+  </form>
 
   {{ if .IsAdmin }}
   <form action="/admin/products/{{ .Product.Id }}/delete" method="post" style="margin-top:20px;">
@@ -16,16 +24,11 @@
   </form>
   {{ end }}
 
-  <ul style="list-style: none; padding: 0;">
-    {{if .IsAdmin}}
-    <li>
-      <a href="/admin/products/{{ .Product.Id }}/edit">edit</a>
-    </li>
-    {{end}}
-    <li>
-      <a href="/products">Back to list</a>
-    </li>
-  </ul>
+  {{if .IsAdmin}}
+  <p><a href="/admin/products/{{ .Product.Id }}/edit">edit</a></p>
+  {{end}}
+  <p><a href="/products">Back to list</a></p>
+
 </body>
 
 </html>
