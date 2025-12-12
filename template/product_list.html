@@ -12,10 +12,11 @@
 
   <ul>
     {{range .Products}}
-    <li><a href="/products/{{ .Id }}">{{ .Name }}</a> - {{.Price}}円</li>
+    <li><a href="/products/{{ .Id }}">{{ .Name }}</a> - {{.Price}}円 - {{.Stock}}個</li>
     {{end}}
   </ul>
 
+  <p><a href="/cart">Cart</a></p>
   {{if .IsAdmin}}
   <a href="/admin/products/new">新規商品登録</a>
   {{end}}

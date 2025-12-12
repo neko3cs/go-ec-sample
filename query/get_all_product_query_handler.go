@@ -20,7 +20,7 @@ func (h *GetAllProductsQueryHandler) Handle(query *GetAllProductsQuery) ([]domai
 
 	var products []domain.Product
 	for _, p := range dbProducts {
-		products = append(products, *domain.NewProduct(p.Id, p.Name, p.Price))
+		products = append(products, *domain.NewProduct(p.Id, p.Name, p.Price, p.Stock))
 	}
 	return products, err
 }
