@@ -10,14 +10,18 @@
   <h1>{{ .Product.Name }}</h1>
   <p>Price: ¥{{ .Product.Price }}</p>
 
+  {{ if .IsAdmin }}
   <form action="/admin/products/{{ .Product.Id }}/delete" method="post" style="margin-top:20px;">
     <button type="submit" onclick="return confirm('本当に削除しますか？');">Delete</button>
   </form>
+  {{ end }}
 
   <ul style="list-style: none; padding: 0;">
+    {{if .IsAdmin}}
     <li>
       <a href="/admin/products/{{ .Product.Id }}/edit">edit</a>
     </li>
+    {{end}}
     <li>
       <a href="/products">Back to list</a>
     </li>
