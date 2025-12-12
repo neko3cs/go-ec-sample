@@ -6,6 +6,7 @@ import (
 
 	"go-ec-sample/service"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,8 +25,11 @@ func (c *ProductController) Index(ctx *gin.Context) {
 		return
 	}
 
+	session := sessions.Default(ctx)
+	isAdmin := session.Get("is_admin")
 	ctx.HTML(http.StatusOK, "product_list.html", gin.H{
 		"Products": products,
+		"IsAdmin":  isAdmin,
 	})
 }
 
@@ -42,8 +46,11 @@ func (c *ProductController) Show(ctx *gin.Context) {
 		return
 	}
 
+	session := sessions.Default(ctx)
+	isAdmin := session.Get("is_admin")
 	ctx.HTML(200, "product_detail.html", gin.H{
 		"Product": product,
+		"IsAdmin": isAdmin,
 	})
 }
 
