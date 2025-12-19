@@ -23,6 +23,7 @@ func (h *UpdateProductCommandHandler) Handle(command *UpdateProductCommand) erro
 
 	p.Name = command.Name
 	p.Price = command.Price
+	p.Stock = command.Stock
 
 	return h.db.Save(p).Error
 }

@@ -55,18 +55,18 @@ func (s *ProductService) GetProduct(id uint) (*domain.Product, error) {
 	return product, err
 }
 
-func (s *ProductService) CreateProduct(name string, price int) error {
+func (s *ProductService) CreateProduct(name string, price int, stock int) error {
 	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := command.NewCreateProductCommand(name, price)
+		c := command.NewCreateProductCommand(name, price, stock)
 		h := command.NewCreateProductCommandHandler(tx)
 		return h.Handle(c)
 	})
 	return err
 }
 
-func (s *ProductService) UpdateProduct(id uint, name string, price int) error {
+func (s *ProductService) UpdateProduct(id uint, name string, price int, stock int) error {
 	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := command.NewUpdateProductCommand(id, name, price)
+		c := command.NewUpdateProductCommand(id, name, price, stock)
 		h := command.NewUpdateProductCommandHandler(tx)
 		return h.Handle(c)
 	})

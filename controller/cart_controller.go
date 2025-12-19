@@ -1,29 +1,26 @@
 package controller
 
 import (
-	"go-ec-sample/db"
-	"go-ec-sample/domain"
-	"go-ec-sample/query"
 	"go-ec-sample/service"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type CartController struct {
-	service *service.CartService
+	cartService    *service.CartService
+	productService *service.ProductService
 }
 
-func NewCartController(s *service.CartService) *CartController {
-	return &CartController{service: s}
+func NewCartController(cartService *service.CartService, productService *service.ProductService) *CartController {
+	return &CartController{cartService: cartService, productService: productService}
 }
 
 func (c *CartController) Index(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	cart, err := c.service.LoadCart(session)
+	cart, err := c.cartService.LoadCart(session)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
@@ -47,17 +44,7 @@ func (c *CartController) Add(ctx *gin.Context) {
 		ctx.String(http.StatusBadRequest, "Invalid quantity")
 		return
 	}
-	var product *domain.Product
-	err = db.GetDB().Transaction(func(tx *gorm.DB) error {
-		q := query.NewGetProductQuery(uint(productId))
-		h := query.NewGetProductQueryHandler(tx)
-		p, err := h.Handle(q)
-		if err != nil {
-			return err
-		}
-		product = p
-		return nil
-	})
+	product, err := c.productService.GetProduct(uint(productId))
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Product not found")
 		return
@@ -68,13 +55,13 @@ func (c *CartController) Add(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	cart, err := c.service.LoadCart(session)
+	cart, err := c.cartService.LoadCart(session)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
 	}
 	cart.AddItem(*product, quantity)
-	c.service.SaveCart(session, cart)
+	c.cartService.SaveCart(session, cart)
 
 	ctx.Redirect(http.StatusFound, "/cart")
 }
@@ -88,26 +75,26 @@ func (c *CartController) Remove(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	cart, err := c.service.LoadCart(session)
+	cart, err := c.cartService.LoadCart(session)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
 	}
 	cart.RemoveItem(uint(productId))
-	c.service.SaveCart(session, cart)
+	c.cartService.SaveCart(session, cart)
 
 	ctx.Redirect(http.StatusFound, "/cart")
 }
 
 func (c *CartController) Checkout(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	cart, err := c.service.LoadCart(session)
+	cart, err := c.cartService.LoadCart(session)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
 	}
 
-	err = c.service.Checkout(cart)
+	err = c.cartService.Checkout(cart)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, err.Error())
 		return

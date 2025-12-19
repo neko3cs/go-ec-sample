@@ -30,6 +30,7 @@ func main() {
 	)
 	cartController := controller.NewCartController(
 		service.NewCartService(),
+		service.NewProductService(),
 	)
 
 	r.GET("/login", loginController.ShowLogin)
