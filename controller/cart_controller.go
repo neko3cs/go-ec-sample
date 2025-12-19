@@ -21,7 +21,8 @@ func NewCartController(cartService *service.CartService, productService *service
 
 func (c *CartController) Index(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	cart, err := c.cartService.LoadCart(session)
+	userId := session.Get(consts.SessionKeyUserID).(uint)
+	cart, err := c.cartService.GetCart(userId)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
@@ -56,13 +57,14 @@ func (c *CartController) Add(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	cart, err := c.cartService.LoadCart(session)
+	userId := session.Get(consts.SessionKeyUserID).(uint)
+	cart, err := c.cartService.GetCart(userId)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
 	}
 	cart.AddItem(*product, quantity)
-	c.cartService.SaveCart(session, cart)
+	c.cartService.SaveCart(cart)
 
 	ctx.Redirect(http.StatusFound, "/cart")
 }
@@ -76,20 +78,22 @@ func (c *CartController) Remove(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	cart, err := c.cartService.LoadCart(session)
+	userId := session.Get(consts.SessionKeyUserID).(uint)
+	cart, err := c.cartService.GetCart(userId)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
 	}
 	cart.RemoveItem(uint(productId))
-	c.cartService.SaveCart(session, cart)
+	c.cartService.SaveCart(cart)
 
 	ctx.Redirect(http.StatusFound, "/cart")
 }
 
 func (c *CartController) Checkout(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	cart, err := c.cartService.LoadCart(session)
+	userId := session.Get(consts.SessionKeyUserID).(uint)
+	cart, err := c.cartService.GetCart(userId)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Failed to load cart")
 		return
