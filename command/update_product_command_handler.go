@@ -2,17 +2,21 @@ package command
 
 import (
 	"go-ec-sample/db"
+
+	"gorm.io/gorm"
 )
 
-type UpdateProductCommandHandler struct{}
+type UpdateProductCommandHandler struct {
+	db *gorm.DB
+}
 
-func NewUpdateProductCommandHandler() *UpdateProductCommandHandler {
-	return &UpdateProductCommandHandler{}
+func NewUpdateProductCommandHandler(db *gorm.DB) *UpdateProductCommandHandler {
+	return &UpdateProductCommandHandler{db: db}
 }
 
 func (h *UpdateProductCommandHandler) Handle(command *UpdateProductCommand) error {
 	var p db.Product
-	err := db.GetDB().First(&p, command.Id).Error
+	err := h.db.First(&p, command.Id).Error
 	if err != nil {
 		return err
 	}
@@ -20,5 +24,5 @@ func (h *UpdateProductCommandHandler) Handle(command *UpdateProductCommand) erro
 	p.Name = command.Name
 	p.Price = command.Price
 
-	return db.GetDB().Save(p).Error
+	return h.db.Save(p).Error
 }
