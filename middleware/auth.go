@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"go-ec-sample/consts"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -10,7 +11,7 @@ import (
 func AuthRequired() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
-		userId := session.Get("user_id")
+		userId := session.Get(consts.SessionKeyUserID)
 
 		if userId == nil {
 			ctx.Redirect(http.StatusFound, "/login")

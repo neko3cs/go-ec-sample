@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"go-ec-sample/consts"
 	"go-ec-sample/service"
 	"net/http"
 	"strconv"
@@ -100,7 +101,7 @@ func (c *CartController) Checkout(ctx *gin.Context) {
 		return
 	}
 
-	session.Delete("cart")
+	session.Delete(consts.SessionKeyCart)
 	session.Save()
 	ctx.Redirect(http.StatusFound, "/products")
 }

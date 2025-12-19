@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"go-ec-sample/consts"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -10,7 +11,7 @@ import (
 func AdminRequired() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
-		isAdmin := session.Get("is_admin")
+		isAdmin := session.Get(consts.SessionKeyIsAdmin)
 
 		if isAdmin != true {
 			ctx.String(http.StatusForbidden, "You are not admin.")
