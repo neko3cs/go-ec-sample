@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"go-ec-sample/db"
+	"go-ec-sample/domain"
 	"go-ec-sample/query"
 	"go-ec-sample/service"
 	"net/http"
@@ -8,6 +10,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type CartController struct {
@@ -44,10 +47,17 @@ func (c *CartController) Add(ctx *gin.Context) {
 		ctx.String(http.StatusBadRequest, "Invalid quantity")
 		return
 	}
-
-	q := query.NewGetProductQuery(uint(productId))
-	h := query.NewGetProductQueryHandler()
-	product, err := h.Handle(q)
+	var product *domain.Product
+	err = db.GetDB().Transaction(func(tx *gorm.DB) error {
+		q := query.NewGetProductQuery(uint(productId))
+		h := query.NewGetProductQueryHandler(tx)
+		p, err := h.Handle(q)
+		if err != nil {
+			return err
+		}
+		product = p
+		return nil
+	})
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Product not found")
 		return

@@ -3,17 +3,21 @@ package query
 import (
 	"go-ec-sample/db"
 	"go-ec-sample/domain"
+
+	"gorm.io/gorm"
 )
 
-type GetAllProductsQueryHandler struct{}
+type GetAllProductsQueryHandler struct {
+	db *gorm.DB
+}
 
-func NewGetAllProductsQueryHandler() *GetAllProductsQueryHandler {
-	return &GetAllProductsQueryHandler{}
+func NewGetAllProductsQueryHandler(db *gorm.DB) *GetAllProductsQueryHandler {
+	return &GetAllProductsQueryHandler{db: db}
 }
 
 func (h *GetAllProductsQueryHandler) Handle(query *GetAllProductsQuery) ([]domain.Product, error) {
 	var dbProducts []db.Product
-	err := db.GetDB().Find(&dbProducts).Error
+	err := h.db.Find(&dbProducts).Error
 	if err != nil {
 		return nil, err
 	}
