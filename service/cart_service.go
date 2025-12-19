@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"go-ec-sample/command"
+	"go-ec-sample/consts"
 	"go-ec-sample/db"
 	"go-ec-sample/domain"
 	"go-ec-sample/viewmodel"
@@ -18,7 +19,7 @@ func NewCartService() *CartService {
 }
 
 func (s *CartService) LoadCart(session sessions.Session) (*domain.Cart, error) {
-	raw := session.Get("cart")
+	raw := session.Get(consts.SessionKeyCart)
 	if raw == nil {
 		return domain.NewCart(), nil
 	}
@@ -35,7 +36,7 @@ func (s *CartService) SaveCart(session sessions.Session, cart *domain.Cart) erro
 	if err != nil {
 		return err
 	}
-	session.Set("cart", string(b))
+	session.Set(consts.SessionKeyCart, string(b))
 	return session.Save()
 }
 

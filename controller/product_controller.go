@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"go-ec-sample/consts"
 	"go-ec-sample/service"
 
 	"github.com/gin-contrib/sessions"
@@ -26,7 +27,7 @@ func (c *ProductController) Index(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	isAdmin := session.Get("is_admin")
+	isAdmin := session.Get(consts.SessionKeyIsAdmin)
 	ctx.HTML(http.StatusOK, "product_list.html", gin.H{
 		"Products": products,
 		"IsAdmin":  isAdmin,
@@ -47,7 +48,7 @@ func (c *ProductController) Show(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	isAdmin := session.Get("is_admin")
+	isAdmin := session.Get(consts.SessionKeyIsAdmin)
 	ctx.HTML(200, "product_detail.html", gin.H{
 		"Product": product,
 		"IsAdmin": isAdmin,

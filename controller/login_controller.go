@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"go-ec-sample/consts"
 	"go-ec-sample/service"
 	"net/http"
 
@@ -33,8 +34,8 @@ func (c *LoginController) Login(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	session.Set("user_id", user.Id())
-	session.Set("is_admin", user.IsAdmin())
+	session.Set(consts.SessionKeyUserID, user.Id())
+	session.Set(consts.SessionKeyIsAdmin, user.IsAdmin())
 	session.Save()
 
 	ctx.Redirect(http.StatusFound, "/products")
