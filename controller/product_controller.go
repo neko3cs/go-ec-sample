@@ -61,14 +61,20 @@ func (c *ProductController) New(ctx *gin.Context) {
 func (c *ProductController) Create(ctx *gin.Context) {
 	name := ctx.PostForm("name")
 	priceStr := ctx.PostForm("price")
+	stockStr := ctx.PostForm("stock")
 
 	price, err := strconv.Atoi(priceStr)
 	if err != nil {
 		ctx.String(400, "Invalid price")
 		return
 	}
+	stock, err := strconv.Atoi(stockStr)
+	if err != nil {
+		ctx.String(400, "Invalid stock")
+		return
+	}
 
-	err = c.service.CreateProduct(name, price)
+	err = c.service.CreateProduct(name, price, stock)
 	if err != nil {
 		ctx.String(500, "Failed to create product")
 		return
@@ -97,21 +103,27 @@ func (c *ProductController) Edit(ctx *gin.Context) {
 
 func (c *ProductController) Update(ctx *gin.Context) {
 	idStr := ctx.Param("id")
+	name := ctx.PostForm("name")
+	priceStr := ctx.PostForm("price")
+	stockStr := ctx.PostForm("stock")
+
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		ctx.String(400, "Invalid ID")
 		return
 	}
-
-	name := ctx.PostForm("name")
-	priceStr := ctx.PostForm("price")
 	price, err := strconv.Atoi(priceStr)
 	if err != nil {
 		ctx.String(400, "Invalid price")
 		return
 	}
+	stock, err := strconv.Atoi(stockStr)
+	if err != nil {
+		ctx.String(400, "Invalid stock")
+		return
+	}
 
-	err = c.service.UpdateProduct(uint(id), name, price)
+	err = c.service.UpdateProduct(uint(id), name, price, stock)
 	if err != nil {
 		ctx.String(500, "Failed to update product")
 		return

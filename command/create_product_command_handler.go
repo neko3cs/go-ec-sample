@@ -18,6 +18,7 @@ func (h *CreateProductCommandHandler) Handle(command *CreateProductCommand) erro
 	p := &db.Product{
 		Name:  command.Name,
 		Price: command.Price,
+		Stock: command.Stock,
 	}
 	return h.db.Create(p).Error
 }
