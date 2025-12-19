@@ -1,14 +1,12 @@
 package service
 
 import (
-	"encoding/json"
+	"errors"
 	"go-ec-sample/command"
-	"go-ec-sample/consts"
 	"go-ec-sample/db"
 	"go-ec-sample/domain"
-	"go-ec-sample/viewmodel"
+	"go-ec-sample/query"
 
-	"github.com/gin-contrib/sessions"
 	"gorm.io/gorm"
 )
 
@@ -18,38 +16,71 @@ func NewCartService() *CartService {
 	return &CartService{}
 }
 
-func (s *CartService) LoadCart(session sessions.Session) (*domain.Cart, error) {
-	raw := session.Get(consts.SessionKeyCart)
-	if raw == nil {
-		return domain.NewCart(), nil
-	}
-	var view *viewmodel.CartView
-	if err := json.Unmarshal([]byte(raw.(string)), &view); err != nil {
-		return nil, err
-	}
-	return view.ToDomainModel(), nil
-}
-
-func (s *CartService) SaveCart(session sessions.Session, cart *domain.Cart) error {
-	view := viewmodel.NewCartView(cart)
-	b, err := json.Marshal(view)
-	if err != nil {
-		return err
-	}
-	session.Set(consts.SessionKeyCart, string(b))
-	return session.Save()
-}
-
-func (s *CartService) Checkout(cart *domain.Cart) error {
-	return db.GetDB().Transaction(func(tx *gorm.DB) error {
-		h := command.NewPurchaseCartCommandHandler(tx)
-		for _, item := range cart.Items() {
-			cmd := command.NewPurchaseCartCommand(item.ProductId(), item.Quantity())
-			err := h.Handle(cmd)
+func (s *CartService) GetCart(userId uint) (*domain.Cart, error) {
+	var cart *domain.Cart
+	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
+		q := query.NewGetCartQuery(userId)
+		qh := query.NewGetCartQueryHandler(tx)
+		c, err := qh.Handle(q)
+		if err != nil {
+			return err
+		}
+		if c == nil {
+			cmd := command.NewCreateCartCommand(userId)
+			ch := command.NewCreateCartCommandHandler(tx)
+			err := ch.Handle(cmd)
+			if err != nil {
+				return err
+			}
+			c, err = qh.Handle(q)
 			if err != nil {
 				return err
 			}
 		}
+		cart = c
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cart, nil
+}
+
+func (s *CartService) SaveCart(cart *domain.Cart) error {
+	return db.GetDB().Transaction(func(tx *gorm.DB) error {
+		cmd := command.NewUpdateCartCommand(cart.CartId(), command.NewUpdateCartItems(cart.Items()))
+		h := command.NewUpdateCartCommandHandler(tx)
+		return h.Handle(cmd)
+	})
+}
+
+func (s *CartService) Checkout(cart *domain.Cart) error {
+	return db.GetDB().Transaction(func(tx *gorm.DB) error {
+		updateProductCommandHandler := command.NewUpdateProductCommandHandler(tx)
+		for _, item := range cart.Items() {
+			getProductQuery := query.NewGetProductQuery(item.ProductId())
+			getProductQueryHandler := query.NewGetProductQueryHandler(tx)
+			product, err := getProductQueryHandler.Handle(getProductQuery)
+			if err != nil {
+				return err
+			}
+			if product.Stock() < item.Quantity() {
+				return errors.New("在庫不足")
+			}
+			product.AddStock(-item.Quantity())
+			updateProductCommand := command.NewUpdateProductCommand(product.Id(), product.Name(), product.Price(), product.Stock())
+			err = updateProductCommandHandler.Handle(updateProductCommand)
+			if err != nil {
+				return err
+			}
+		}
+		deleteCartCommandHandler := command.NewDeleteCartCommandHandler(tx)
+		deleteCartCommand := command.NewDeleteCartCommand(cart.CartId())
+		err := deleteCartCommandHandler.Handle(deleteCartCommand)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

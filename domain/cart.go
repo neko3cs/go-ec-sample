@@ -1,21 +1,21 @@
 package domain
 
 type Cart struct {
-	items []*CartItem
+	cartId uint
+	userId uint
+	items  []*CartItem
 }
 
-func NewCart() *Cart {
+func NewCart(cartId uint, userId uint, items []*CartItem) *Cart {
 	return &Cart{
-		items: []*CartItem{},
+		cartId: cartId,
+		userId: userId,
+		items:  items,
 	}
 }
 
-func NewCartWithItems(items []*CartItem) *Cart {
-	return &Cart{
-		items: items,
-	}
-}
-
+func (c *Cart) CartId() uint       { return c.cartId }
+func (c *Cart) UserId() uint       { return c.userId }
 func (c *Cart) Items() []*CartItem { return c.items }
 
 func (c *Cart) TotalCost() int {
@@ -33,7 +33,7 @@ func (c *Cart) AddItem(p Product, quantity int) {
 			return
 		}
 	}
-	c.items = append(c.items, NewCartItem(p.Id(), p.Name(), p.Price(), quantity))
+	c.items = append(c.items, NewCartItem(0, 0, p.Id(), &p, quantity))
 }
 
 func (c *Cart) RemoveItem(productId uint) {

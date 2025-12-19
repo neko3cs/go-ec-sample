@@ -16,10 +16,11 @@ func NewProduct(id uint, name string, price int, stock int) *Product {
 	}
 }
 
-func (p *Product) Id() uint { return p.id }
-
+func (p *Product) Id() uint     { return p.id }
 func (p *Product) Name() string { return p.name }
+func (p *Product) Price() int   { return p.price }
+func (p *Product) Stock() int   { return p.stock }
 
-func (p *Product) Price() int { return p.price }
-
-func (p *Product) Stock() int { return p.stock }
+func (p *Product) AddStock(quantity int) {
+	p.stock += quantity
+}

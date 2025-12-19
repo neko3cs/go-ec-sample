@@ -19,7 +19,9 @@ func Init() {
 
 	db.AutoMigrate(
 		&Product{},
-		&User{})
+		&User{},
+		&Cart{},
+		&CartItem{})
 
 	db.Create(&Product{Name: "Apple", Price: 120, Stock: 50})
 	db.Create(&Product{Name: "Banana", Price: 80, Stock: 100})
