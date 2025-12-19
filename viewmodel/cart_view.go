@@ -28,7 +28,7 @@ func NewCartView(cart *domain.Cart) *CartView {
 	}
 }
 
-func (cv *CartView) ToDomainCart() *domain.Cart {
+func (cv *CartView) ToDomainModel() *domain.Cart {
 	cartItems := make([]*domain.CartItem, 0)
 	for _, item := range cv.Items {
 		cartItem := domain.NewCartItem(item.ProductId, item.Name, item.Price, item.Quantity)

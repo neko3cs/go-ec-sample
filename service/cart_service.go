@@ -22,11 +22,11 @@ func (s *CartService) LoadCart(session sessions.Session) (*domain.Cart, error) {
 	if raw == nil {
 		return domain.NewCart(), nil
 	}
-	var view viewmodel.CartView
+	var view *viewmodel.CartView
 	if err := json.Unmarshal([]byte(raw.(string)), &view); err != nil {
 		return nil, err
 	}
-	return view.ToDomainCart(), nil
+	return view.ToDomainModel(), nil
 }
 
 func (s *CartService) SaveCart(session sessions.Session, cart *domain.Cart) error {
