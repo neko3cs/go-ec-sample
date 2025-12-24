@@ -35,7 +35,6 @@ func (c *CartController) Index(ctx *gin.Context) {
 func (c *CartController) Add(ctx *gin.Context) {
 	productIdStr := ctx.PostForm("product_id")
 	quantityStr := ctx.PostForm("quantity")
-
 	productId, err := strconv.Atoi(productIdStr)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Invalid product id")
@@ -46,26 +45,14 @@ func (c *CartController) Add(ctx *gin.Context) {
 		ctx.String(http.StatusBadRequest, "Invalid quantity")
 		return
 	}
-	product, err := c.productService.GetProduct(uint(productId))
-	if err != nil {
-		ctx.String(http.StatusBadRequest, "Product not found")
-		return
-	}
-	if product.Stock() < quantity {
-		ctx.String(http.StatusBadRequest, "Not enough stock")
-		return
-	}
 
 	session := sessions.Default(ctx)
 	userId := session.Get(consts.SessionKeyUserID).(uint)
-	cart, err := c.cartService.GetCart(userId)
+	err = c.cartService.AddToCart(userId, uint(productId), quantity)
 	if err != nil {
-		ctx.String(http.StatusBadRequest, "Failed to load cart")
+		ctx.String(http.StatusBadRequest, "Failed to add item to cart")
 		return
 	}
-	cart.AddItem(*product, quantity)
-	c.cartService.SaveCart(cart)
-
 	ctx.Redirect(http.StatusFound, "/cart")
 }
 
@@ -79,13 +66,11 @@ func (c *CartController) Remove(ctx *gin.Context) {
 
 	session := sessions.Default(ctx)
 	userId := session.Get(consts.SessionKeyUserID).(uint)
-	cart, err := c.cartService.GetCart(userId)
+	err = c.cartService.RemoveFromCart(userId, uint(productId))
 	if err != nil {
-		ctx.String(http.StatusBadRequest, "Failed to load cart")
+		ctx.String(http.StatusBadRequest, "Failed to remove item from cart")
 		return
 	}
-	cart.RemoveItem(uint(productId))
-	c.cartService.SaveCart(cart)
 
 	ctx.Redirect(http.StatusFound, "/cart")
 }
@@ -93,13 +78,7 @@ func (c *CartController) Remove(ctx *gin.Context) {
 func (c *CartController) Checkout(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	userId := session.Get(consts.SessionKeyUserID).(uint)
-	cart, err := c.cartService.GetCart(userId)
-	if err != nil {
-		ctx.String(http.StatusBadRequest, "Failed to load cart")
-		return
-	}
-
-	err = c.cartService.Checkout(cart)
+	err := c.cartService.Checkout(userId)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, err.Error())
 		return

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"go-ec-sample/command"
 	"go-ec-sample/db"
-	"go-ec-sample/domain"
 	"go-ec-sample/query"
+	"go-ec-sample/querymodel"
 
 	"gorm.io/gorm"
 )
@@ -16,8 +16,8 @@ func NewCartService() *CartService {
 	return &CartService{}
 }
 
-func (s *CartService) GetCart(userId uint) (*domain.Cart, error) {
-	var cart *domain.Cart
+func (s *CartService) GetCart(userId uint) (*querymodel.Cart, error) {
+	var cart *querymodel.Cart
 	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
 		q := query.NewGetCartQuery(userId)
 		qh := query.NewGetCartQueryHandler(tx)
@@ -46,21 +46,61 @@ func (s *CartService) GetCart(userId uint) (*domain.Cart, error) {
 	return cart, nil
 }
 
-func (s *CartService) SaveCart(cart *domain.Cart) error {
+func (s *CartService) AddToCart(userId uint, productId uint, quantity int) error {
 	return db.GetDB().Transaction(func(tx *gorm.DB) error {
-		cmd := command.NewUpdateCartCommand(cart.CartId(), command.NewUpdateCartItems(cart.Items()))
-		h := command.NewUpdateCartCommandHandler(tx)
-		return h.Handle(cmd)
+		loadCartCmd := command.NewLoadCartCommand(userId)
+		loadCartCmdHandler := command.NewLoadCartCommandHandler(tx)
+		cart, err := loadCartCmdHandler.Handle(loadCartCmd)
+		if err != nil {
+			return err
+		}
+
+		loadProductCmd := command.NewLoadProductCommand(productId)
+		loadProductCmdHandler := command.NewLoadProductCommandHandler(tx)
+		product, err := loadProductCmdHandler.Handle(loadProductCmd)
+		if err != nil {
+			return err
+		}
+
+		cart.AddItem(*product, quantity)
+
+		updateCartCmd := command.NewUpdateCartCommand(cart.CartId(), command.NewUpdateCartItems(cart.Items()))
+		updateCartCmdHandler := command.NewUpdateCartCommandHandler(tx)
+		return updateCartCmdHandler.Handle(updateCartCmd)
 	})
 }
 
-func (s *CartService) Checkout(cart *domain.Cart) error {
+func (s *CartService) RemoveFromCart(userId uint, productId uint) error {
 	return db.GetDB().Transaction(func(tx *gorm.DB) error {
+		loadCartCmd := command.NewLoadCartCommand(userId)
+		loadCartCmdHandler := command.NewLoadCartCommandHandler(tx)
+		cart, err := loadCartCmdHandler.Handle(loadCartCmd)
+		if err != nil {
+			return err
+		}
+
+		cart.RemoveItem(productId)
+
+		updateCartCmd := command.NewUpdateCartCommand(cart.CartId(), command.NewUpdateCartItems(cart.Items()))
+		updateCartCmdHandler := command.NewUpdateCartCommandHandler(tx)
+		return updateCartCmdHandler.Handle(updateCartCmd)
+	})
+}
+
+func (s *CartService) Checkout(userId uint) error {
+	return db.GetDB().Transaction(func(tx *gorm.DB) error {
+		loadCartCmd := command.NewLoadCartCommand(userId)
+		loadCartCmdHandler := command.NewLoadCartCommandHandler(tx)
+		cart, err := loadCartCmdHandler.Handle(loadCartCmd)
+		if err != nil {
+			return err
+		}
+
 		updateProductCommandHandler := command.NewUpdateProductCommandHandler(tx)
 		for _, item := range cart.Items() {
-			getProductQuery := query.NewGetProductQuery(item.ProductId())
-			getProductQueryHandler := query.NewGetProductQueryHandler(tx)
-			product, err := getProductQueryHandler.Handle(getProductQuery)
+			loadProductCmd := command.NewLoadProductCommand(item.ProductId())
+			loadProductCmdHandler := command.NewLoadProductCommandHandler(tx)
+			product, err := loadProductCmdHandler.Handle(loadProductCmd)
 			if err != nil {
 				return err
 			}
@@ -76,7 +116,7 @@ func (s *CartService) Checkout(cart *domain.Cart) error {
 		}
 		deleteCartCommandHandler := command.NewDeleteCartCommandHandler(tx)
 		deleteCartCommand := command.NewDeleteCartCommand(cart.CartId())
-		err := deleteCartCommandHandler.Handle(deleteCartCommand)
+		err = deleteCartCommandHandler.Handle(deleteCartCommand)
 		if err != nil {
 			return err
 		}

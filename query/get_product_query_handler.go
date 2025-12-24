@@ -2,7 +2,7 @@ package query
 
 import (
 	"go-ec-sample/db"
-	"go-ec-sample/domain"
+	"go-ec-sample/querymodel"
 
 	"gorm.io/gorm"
 )
@@ -15,13 +15,18 @@ func NewGetProductQueryHandler(db *gorm.DB) *GetProductQueryHandler {
 	return &GetProductQueryHandler{db: db}
 }
 
-func (h *GetProductQueryHandler) Handle(q *GetProductQuery) (*domain.Product, error) {
+func (h *GetProductQueryHandler) Handle(q *GetProductQuery) (*querymodel.ProductDetail, error) {
 	var dbProduct db.Product
 	err := h.db.First(&dbProduct, q.id).Error
 	if err != nil {
 		return nil, err
 	}
 
-	product := domain.NewProduct(dbProduct.Id, dbProduct.Name, dbProduct.Price, dbProduct.Stock)
-	return product, nil
+	product := querymodel.ProductDetail{
+		Id:    dbProduct.Id,
+		Name:  dbProduct.Name,
+		Price: dbProduct.Price,
+		Stock: dbProduct.Stock,
+	}
+	return &product, nil
 }
