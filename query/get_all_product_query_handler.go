@@ -2,7 +2,7 @@ package query
 
 import (
 	"go-ec-sample/db"
-	"go-ec-sample/domain"
+	"go-ec-sample/querymodel"
 
 	"gorm.io/gorm"
 )
@@ -15,16 +15,21 @@ func NewGetAllProductsQueryHandler(db *gorm.DB) *GetAllProductsQueryHandler {
 	return &GetAllProductsQueryHandler{db: db}
 }
 
-func (h *GetAllProductsQueryHandler) Handle(query *GetAllProductsQuery) ([]domain.Product, error) {
+func (h *GetAllProductsQueryHandler) Handle(query *GetAllProductsQuery) ([]querymodel.ProductListItem, error) {
 	var dbProducts []db.Product
 	err := h.db.Find(&dbProducts).Error
 	if err != nil {
 		return nil, err
 	}
 
-	var products []domain.Product
+	var products []querymodel.ProductListItem
 	for _, p := range dbProducts {
-		products = append(products, *domain.NewProduct(p.Id, p.Name, p.Price, p.Stock))
+		products = append(products, querymodel.ProductListItem{
+			Id:    p.Id,
+			Name:  p.Name,
+			Price: p.Price,
+			Stock: p.Stock,
+		})
 	}
 	return products, err
 }

@@ -3,7 +3,7 @@ package query
 import (
 	"errors"
 	"go-ec-sample/db"
-	"go-ec-sample/domain"
+	"go-ec-sample/querymodel"
 
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ func NewGetCartQueryHandler(db *gorm.DB) *GetCartQueryHandler {
 	return &GetCartQueryHandler{db: db}
 }
 
-func (h *GetCartQueryHandler) Handle(query *GetCartQuery) (*domain.Cart, error) {
+func (h *GetCartQueryHandler) Handle(query *GetCartQuery) (*querymodel.Cart, error) {
 	var c db.Cart
 	err := h.db.
 		Preload("Items.Product").
@@ -29,23 +29,25 @@ func (h *GetCartQueryHandler) Handle(query *GetCartQuery) (*domain.Cart, error) 
 		return nil, err
 	}
 
-	cartItems := make([]*domain.CartItem, 0, len(c.Items))
+	cartItems := make([]*querymodel.CartItem, 0, len(c.Items))
 	for _, item := range c.Items {
-		cartItem := domain.NewCartItem(
-			item.CartItemId,
-			item.CartId,
-			item.ProductId,
-			domain.NewProduct(
-				item.Product.Id,
-				item.Product.Name,
-				item.Product.Price,
-				item.Product.Stock,
-			),
-			item.Quantity,
-		)
-		cartItems = append(cartItems, cartItem)
+		cartItem := querymodel.CartItem{
+			ProductId:    item.ProductId,
+			ProductName:  item.Product.Name,
+			Price:        item.Product.Price,
+			Quantity:     item.Quantity,
+			SubTotalCost: item.Product.Price * item.Quantity,
+		}
+		cartItems = append(cartItems, &cartItem)
 	}
 
-	cart := domain.NewCart(c.CartId, c.UserId, cartItems)
-	return cart, nil
+	totalCost := 0
+	for _, item := range cartItems {
+		totalCost += item.SubTotalCost
+	}
+	cart := querymodel.Cart{
+		Items:     cartItems,
+		TotalCost: totalCost,
+	}
+	return &cart, nil
 }

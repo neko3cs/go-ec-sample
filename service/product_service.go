@@ -3,8 +3,8 @@ package service
 import (
 	"go-ec-sample/command"
 	"go-ec-sample/db"
-	"go-ec-sample/domain"
 	"go-ec-sample/query"
+	"go-ec-sample/querymodel"
 
 	"gorm.io/gorm"
 )
@@ -15,8 +15,8 @@ func NewProductService() *ProductService {
 	return &ProductService{}
 }
 
-func (s *ProductService) GetAllProducts() ([]domain.Product, error) {
-	var products []domain.Product
+func (s *ProductService) GetAllProducts() ([]querymodel.ProductListItem, error) {
+	var products []querymodel.ProductListItem
 
 	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
 		q := query.NewGetAllProductsQuery()
@@ -35,8 +35,8 @@ func (s *ProductService) GetAllProducts() ([]domain.Product, error) {
 	return products, nil
 }
 
-func (s *ProductService) GetProduct(id uint) (*domain.Product, error) {
-	var product *domain.Product
+func (s *ProductService) GetProduct(id uint) (*querymodel.ProductDetail, error) {
+	var product *querymodel.ProductDetail
 
 	err := db.GetDB().Transaction(func(tx *gorm.DB) error {
 		q := query.NewGetProductQuery(id)
